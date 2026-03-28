@@ -117,15 +117,8 @@ function loadOne(url){
   const p=new Promise(res=>{
     const im=new Image();
     im.decoding='async';
-    im.referrerPolicy='no-referrer';
     im.onload=()=>{
-      const fname=(url||'').split('/').pop();
       imgByUrl.set(url,im);
-      if(fname)imgByUrl.set(ASSET_BASE+fname,im);
-      try{
-        const abs=new URL(ASSET_BASE+fname,location.href).href;
-        if(abs!==url)imgByUrl.set(abs,im);
-      }catch(_){}
       res(im);
     };
     im.onerror=()=>res(null);
@@ -143,11 +136,6 @@ function preloadAssets(){
 function resolveImg(url){
   const im=imgByUrl.get(url);
   if(im&&im.complete&&im.naturalWidth)return im;
-  try{
-    const abs=url.startsWith('http')||url.startsWith('file:')?url:new URL(url,location.href).href;
-    const alt=imgByUrl.get(abs);
-    if(alt&&alt.complete&&alt.naturalWidth)return alt;
-  }catch(_){}
   loadOne(url);
   return null;
 }
